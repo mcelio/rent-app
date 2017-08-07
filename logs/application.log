@@ -1,0 +1,8 @@
+2017-08-02 23:45:08,305 [INFO] from play.api.http.EnabledFilters in scala-execution-context-global-45 - Enabled Filters (see <https://www.playframework.com/documentation/latest/Filters>):
+
+
+2017-08-02 23:45:08,335 [INFO] from play.api.Play in scala-execution-context-global-45 - Application started (Dev)
+2017-08-02 23:46:09,637 [INFO] from play.api.http.EnabledFilters in scala-execution-context-global-119 - Enabled Filters (see <https://www.playframework.com/documentation/latest/Filters>):
+
+
+2017-08-02 23:46:09,640 [INFO] from play.api.Play in scala-execution-context-global-119 - Application started (Dev)
