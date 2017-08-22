@@ -23,15 +23,18 @@ class PersonController @Inject()(repo: PersonRepository,
   val personForm: Form[CreatePersonForm] = Form {
     mapping(
       "name" -> nonEmptyText,
-      "age" -> number.verifying(min(0), max(140))
+      "lastname" -> nonEmptyText,
+      "age" -> number.verifying(min(0), max(140)),
+      "email" -> email,
+      "passport" -> nonEmptyText
     )(CreatePersonForm.apply)(CreatePersonForm.unapply)
   }
 
   /**
-   * The index action.
+   * The person action.
    */
-  def index = Action { implicit request =>
-    Ok(views.html.index(personForm))
+  def person = Action { implicit request =>
+    Ok(views.html.person(personForm, "person"))
   }
 
   /**
@@ -45,18 +48,20 @@ class PersonController @Inject()(repo: PersonRepository,
       // The error function. We return the index page with the error form, which will render the errors.
       // We also wrap the result in a successful future, since this action is synchronous, but we're required to return
       // a future because the person creation function returns a future.
+
       errorForm => {
-        Future.successful(Ok(views.html.index(errorForm)))
+        Future.successful(Ok(views.html.person(errorForm, "person")))
       },
       // There were no errors in the from, so create the person.
       person => {
-        repo.create(person.name, person.age).map { _ =>
+        repo.create(person.name, person.lastname, person.age, person.email, person.passport).map { _ =>
           // If successful, we simply redirect to the index page.
-          Redirect(routes.PersonController.index)
+          Redirect(routes.PersonController.person)
         }
       }
     )
   }
+
 
   /**
    * A REST endpoint that gets all the people as JSON.
@@ -75,4 +80,4 @@ class PersonController @Inject()(repo: PersonRepository,
  * in a different way to your models.  In this case, it doesn't make sense to have an id parameter in the form, since
  * that is generated once it's created.
  */
-case class CreatePersonForm(name: String, age: Int)
+case class CreatePersonForm(name: String, lastname: String, age: Int, email: String, passport: String)
