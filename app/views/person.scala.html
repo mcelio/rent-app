@@ -10,11 +10,24 @@
 		<div class="row">
 			<div class="col">
 				@helper.form(action = routes.PersonController.addPerson()) {
-					@inputText(personForm("name"), '_label->"First Name", 'class->"form-control")
+
+					Person <input type="text" readonly class="form-control" ng-model="selectedPerson.name" size="20" />
+
+					First Name
+					<input type="text" name="name" @personForm.data.get("name") class="form-control"/>
+					Last Name
+					<input type="text" name="lastname" @personForm.data.get("lastname") class="form-control"/>
+					Age
+					<input type="text" name="age" @personForm.data.get("age") class="form-control"/>
+					Email
+					<input type="text" name="age" @personForm.data.get("email") class="form-control"/>
+					Passport Number/ID  <input type="text" name="passport" @personForm.data.get("passport") class="form-control"/>
+
+					<!--@inputText(personForm("name"), '_label->"First Name", 'class->"form-control")
 					@inputText(personForm("lastname"), '_label->"Last Name", 'class->"form-control")
 					@inputText(personForm("age"), '_label->"Age", 'class->"form-control")
 					@inputText(personForm("email"), '_label->"Email", 'class->"form-control")
-					@inputText(personForm("passport"), '_label->"Passport", 'class->"form-control")
+					@inputText(personForm("passport"), '_label->"Passport", 'class->"form-control")-->
 					<div class="buttons">
 						<input type="submit" class="btn btn-success" value="Add Person"/>
 					</div>
