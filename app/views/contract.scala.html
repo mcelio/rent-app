@@ -1,0 +1,124 @@
+@(contractForm: Form[CreateContractForm],menu: String)(implicit messages: Messages)
+
+@import helper._
+@import b3.vertical.fieldConstructor
+@import helper.Implicits._
+
+@main("Rent manager", menu) {
+
+	<script>
+		$(document).ready(function(){
+			var dialog = $( "#dialog-form" ).dialog({
+			  autoOpen: false,
+			  height: 400,
+			  width: 550,
+			  modal: true,
+			  buttons: {
+				"Select Person": function() {
+					$("#personId").val(($('input[name=personGroup]:checked'	).val()));
+					dialog.dialog( "close" );
+				},
+				Cancel: function() {
+				  dialog.dialog( "close" );
+				}
+			  },
+			  close: function() {
+
+			  }
+			});
+
+			$( "#select-person" ).button().on( "click", function() {
+			  	dialog.dialog( "open" );
+			});
+
+			$('#beginDate').datepicker();
+
+			$('#endDate').datepicker();
+		});
+	</script>
+
+	<div class="container" ng-app="rentApp">
+
+		<div class="row" ng-controller="SelectPerson">
+			<div class='col-sm-6'>
+				<div class="form-group">
+
+					<div id="dialog-form" title="Select Person"  >
+						<h2>Select Person</h2>
+						<table class="table table-bordered" id="select-person-table">
+							<thead>
+							<tr>
+								<th></th>
+								<th>Name</th>
+								<th>Email</th>
+								<th>Passport Number/ID</th>
+							</tr>
+							</thead>
+							<tbody class="member">
+							<tr ng-repeat="person in selectPersonTable">
+								<td><input type="radio" value="{{person.id}}" name="personGroup" ng-model="selectedPerson" ng-click="setPerson(person)"/></td>
+								<td>{{person.name + ' ' + person.lastname}}</td>
+								<td>{{person.email}}</td>
+								<td>{{person.passport}}</td>
+							</tr>
+							</tbody>
+						</table>
+
+						{{selectPersonTable}}
+					</div>
+
+
+
+					<div class="row">
+						<div class="col">
+
+							<button id="select-person" class="btn btn-success">Select Person</button>
+
+							@helper.form(action = routes.ContractController.addContract()) {
+
+								<input type="hidden" id="personId" name="personId" @contractForm.data.get("personId") ng-model="selectedPerson.id"/>
+
+								Person <input type="text" readonly class="form-control" ng-model="selectedPerson.name" size="20" />
+								<input type="hidden" id="personId" name="personId" @contractForm.data.get("personId") ng-model="selectedPerson.id"/>
+								Begin Date
+								<input type="text" id="beginDate" name="beginDate" @contractForm.data.get("beginDate") class="datepicker form-control" size="7" />
+								End Date
+								<input type="text" id="endDate" name="endDate" @contractForm.data.get("endDate") class="datepicker form-control" size="7" />
+
+								<div class="buttons">
+									<input type="submit" class="btn btn-success" value="Add Contract"/>
+								</div>
+							}
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col" ng-controller="ContractList">
+			<h2>Contracts</h2>
+			<table class="table table-bordered">
+				<thead>
+				<tr>
+					<th>Person ID</th>
+					<th>Begin Date</th>
+					<th>End Date</th>
+				</tr>
+				</thead>
+				<tbody class="member">
+				<tr ng-repeat="contract in contractList">
+					<td>{{contract.personId}}</td>
+					<td>{{contract.beginDate}}</td>
+					<td>{{contract.endDate}}</td>
+				</tr>
+				</tbody>
+			</table>
+
+			{{contractList}}
+		</div>
+	</div>
+
+
+
+}

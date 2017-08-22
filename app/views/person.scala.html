@@ -1,0 +1,46 @@
+@(personForm: Form[CreatePersonForm], menu: String)(implicit messages: Messages)
+
+@import helper._
+
+
+@main("Rent manager", menu) {
+
+	<div class="container">
+		<h2>Person Data</h2>
+		<div class="row">
+			<div class="col">
+				@helper.form(action = routes.PersonController.addPerson()) {
+					@inputText(personForm("name"), '_label->"First Name", 'class->"form-control")
+					@inputText(personForm("lastname"), '_label->"Last Name", 'class->"form-control")
+					@inputText(personForm("age"), '_label->"Age", 'class->"form-control")
+					@inputText(personForm("email"), '_label->"Email", 'class->"form-control")
+					@inputText(personForm("passport"), '_label->"Passport", 'class->"form-control")
+					<div class="buttons">
+						<input type="submit" class="btn btn-success" value="Add Person"/>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+
+	<div class="col" ng-app="rentApp" ng-controller="PersonList">
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Last Name</th>
+					<th>Email</th>
+				</tr>
+			</thead>
+			<tbody class="member">
+				<tr ng-repeat="person in personList">
+					<td>{{person.name}}</td>
+					<td>{{person.lastname}}</td>
+					<td>{{person.email}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+
+}
