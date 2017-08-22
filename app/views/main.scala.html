@@ -1,20 +1,56 @@
-@(title: String)(content: Html)
+@(title: String, menu: String)(content: Html)
 
 <!DOCTYPE html>
 
 <html>
     <head>
         <title>@title</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")"/>
+        <script type='text/javascript'src='@routes.Assets.at("javascripts/jquery-2.2.0.min.js")'></script>
         <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")"/>
-        <script src="@routes.Assets.versioned("javascripts/jquery-2.2.0.min.js")" 
-            type="text/javascript">
-        </script>
         <link rel="stylesheet" href='@routes.Assets.at("bootstrap-3.3.7/css/bootstrap.min.css")'/>
-        <script type='text/javascript'src='@routes.Assets.at("bootstrap-3.3.7/js/bootstrap.min.js")'>
-        </script>
+        <link rel="stylesheet" href='@routes.Assets.at("jquery-ui-1.12.1.custom/jquery-ui.css")'/>
+        <script type='text/javascript'src='@routes.Assets.at("jquery-ui-1.12.1.custom/jquery-ui.min.js")'></script>
+        <script type='text/javascript'src='@routes.Assets.at("angular-1.6.5/angular.min.js")'></script>
+        <script type='text/javascript'src='@routes.Assets.at("angular-1.6.5/angular-resource.min.js")'></script>
+        <script type='text/javascript'src='@routes.Assets.at("javascripts/rent-app.js")'></script>
     </head>
-    <body>
-       @content
+
+    @activeLink(value:String) = @{
+        if(menu == value)
+            "active"
+    }
+
+    <body data-spy="scroll" data-target="rent-nav-bar">
+
+       <nav class="navbar navbar-default">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" data-target="#navbarCollapse" class="navbar-toggle collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Rent Manager</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="#" class="navbar-brand">Rent Manager</a>
+            </div>
+            <!-- Collection of nav links and other content for toggling -->
+            <div id="navbarCollapse" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-left">
+                    <li class="@activeLink("person")"><a href="/person">Person</a></li>
+                    <li class="@activeLink("contract")"><a href="/contract">Contract</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li ><a href="#">Login</a></li>
+                </ul>
+            </div>
+        </nav>
+
+            <div class="container">
+            @content
+        </div>
+
+
     </body>
 </html>
