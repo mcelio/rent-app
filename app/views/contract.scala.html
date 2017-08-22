@@ -1,8 +1,6 @@
 @(contractForm: Form[CreateContractForm],menu: String)(implicit messages: Messages)
 
 @import helper._
-@import b3.vertical.fieldConstructor
-@import helper.Implicits._
 
 @main("Rent manager", menu) {
 
@@ -38,7 +36,7 @@
 	</script>
 
 	<div class="container" ng-app="rentApp">
-
+		<h2>Contract Data</h2>
 		<div class="row" ng-controller="SelectPerson">
 			<div class='col-sm-6'>
 				<div class="form-group">
@@ -75,8 +73,6 @@
 							<button id="select-person" class="btn btn-success">Select Person</button>
 
 							@helper.form(action = routes.ContractController.addContract()) {
-
-								<input type="hidden" id="personId" name="personId" @contractForm.data.get("personId") ng-model="selectedPerson.id"/>
 
 								Person <input type="text" readonly class="form-control" ng-model="selectedPerson.name" size="20" />
 								<input type="hidden" id="personId" name="personId" @contractForm.data.get("personId") ng-model="selectedPerson.id"/>
