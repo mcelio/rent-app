@@ -1,23 +1,7 @@
-@(person: Form[CreatePersonForm])(implicit messages: Messages)
+@(implicit messages: Messages)
 
 @import helper._
 
-@main("Welcome to Play") {
-	<script type='text/javascript' src='@routes.Assets.versioned("javascripts/index.js")'></script>
-	<link rel="stylesheet" href='@routes.Assets.at("bootstrap-3.3.7/css/bootstrap.min.css")'/>
-    <script type='text/javascript'src='@routes.Assets.at("bootstrap-3.3.7/js/bootstrap.min.js")'>
-    </script>
-	
-	<ul id="persons"></ul>
+@main("Rent Manager", "person") {
 
-  @form(routes.PersonController.addPerson()) {
-		@inputText(person("name"))
-		@inputText(person("age"))
-
-		<div class="buttons">
-			<input type="submit" value="Add Person"/>			
-		</div>
-
-		<button type="button" class="btn btn-success">Success</button>
-	}
 }
