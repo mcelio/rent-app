@@ -1,2 +1,5 @@
 name = Name
 age = Age
+person = Person
+personId = Person ID
+passportNumber_Id = Passport Number/ID
