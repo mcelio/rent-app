@@ -5,7 +5,7 @@
 # Home page
 GET     /                           controllers.PersonController.person
 GET     /person                     controllers.PersonController.person
-POST    /addPerson                  controllers.PersonController.addPerson
+POST    /createPerson               controllers.PersonController.createPerson
 GET     /contract                   controllers.ContractController.contract
 POST    /addContract                controllers.ContractController.addContract
 GET     /persons                    controllers.PersonController.getPersons
