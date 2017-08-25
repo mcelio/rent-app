@@ -3,14 +3,16 @@ package controllers
 import javax.inject._
 
 import dal._
+import models.Person
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 import play.api.i18n._
-import play.api.libs.json.Json
+import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 class PersonController @Inject()(repo: PersonRepository,
                                   cc: ControllerComponents
@@ -38,37 +40,32 @@ class PersonController @Inject()(repo: PersonRepository,
   }
 
   /**
-   * The add person action.
-   *
-   * This is asynchronous, since we're invoking the asynchronous methods on PersonRepository.
-   */
-  def addPerson = Action.async { implicit request =>
-    // Bind the form first, then fold the result, passing a function to handle errors, and a function to handle succes.
-    personForm.bindFromRequest.fold(
-      // The error function. We return the index page with the error form, which will render the errors.
-      // We also wrap the result in a successful future, since this action is synchronous, but we're required to return
-      // a future because the person creation function returns a future.
-
-      errorForm => {
-        Future.successful(Ok(views.html.person(errorForm, "person")))
-      },
-      // There were no errors in the from, so create the person.
-      person => {
-        repo.create(person.name, person.lastname, person.age, person.email, person.passport).map { _ =>
-          // If successful, we simply redirect to the index page.
-          Redirect(routes.PersonController.person)
-        }
-      }
-    )
-  }
-
-
-  /**
    * A REST endpoint that gets all the people as JSON.
    */
   def getPersons = Action.async { implicit request =>
     repo.list().map { people =>
       Ok(Json.toJson(people))
+    }
+  }
+
+
+
+
+  def createPerson() = Action.async { implicit request =>
+    implicit val personReader = Json.reads[Person]
+    val jsonBody: JsValue = request.body.asJson.get
+    val name = (jsonBody \ "name").as[String]
+    val lastname = (jsonBody \ "lastname").as[String]
+    val age = (jsonBody \ "age").as[String]
+    val email = (jsonBody \ "email").as[String]
+    val passport = (jsonBody \ "passport").as[String]
+    repo.create(name, lastname, age.toInt, email, passport) map {personObj =>
+      Future {
+        Ok(Json.toJson(personObj))
+      }
+    }
+    Future {
+      Ok(views.html.person(personForm, "person"))
     }
   }
 }
