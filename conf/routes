@@ -5,10 +5,16 @@
 # Home page
 GET     /                           controllers.PersonController.person
 GET     /person                     controllers.PersonController.person
+GET     /person/:id                 controllers.PersonController.fetchPerson(id: Long)
+GET     /property                   controllers.PropertyController.property
 POST    /createPerson               controllers.PersonController.createPerson
+POST    /createProperty             controllers.PropertyController.createProperty
 GET     /contract                   controllers.ContractController.contract
-POST    /addContract                controllers.ContractController.addContract
+POST    /createContract             controllers.ContractController.createContract
 GET     /persons                    controllers.PersonController.getPersons
+GET     /properties                 controllers.PropertyController.getProperties
+DELETE  /person/:id                 controllers.PersonController.deletePerson(id: Long)
+DELETE  /property/:id               controllers.PropertyController.deleteProperty(id: Long)
 GET     /contracts                  controllers.ContractController.getContracts
 
 # Map static resources from the /public folder to the /assets URL path
