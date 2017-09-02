@@ -1,9 +1,10 @@
-@(contractForm: Form[CreateContractForm],menu: String)(implicit messages: Messages)
+@(menu: String)(implicit messages: Messages)
 
 @import helper._
 
 @main("Rent manager", menu) {
 
+<script type='text/javascript'src='@routes.Assets.at("javascripts/contract.js")'></script>
 	<script>
 		$(document).ready(function(){
 			var dialog = $( "#dialog-form" ).dialog({
@@ -35,84 +36,118 @@
 		});
 	</script>
 
-	<div class="container" ng-app="rentApp">
-		<h2>Contract Data</h2>
-		<div class="row" ng-controller="SelectPerson">
-			<div class='col-sm-6'>
-				<div class="form-group">
+	<div class="container" ng-app="contractApp" ng-controller="ContractList">
+		<h3>Contract Data</h3>
+		<div class="row">
+			<div class='col'>
+				<div id="dialog-form" title="Select Person">
+					<h2>Select Person</h2>
+					<table class="table table-bordered table table-fixed">
+						<thead>
+						<tr>
+							<th></th>
+							<th>Name</th>
+							<th>Email</th>
+							<th>Passport Number/ID</th>
+						</tr>
+						</thead>
+						<tbody class="member">
+						<tr ng-repeat="person in selectPersonTable">
+							<td><input type="radio" value="{{person.id}}" name="personGroup" ng-model="selectedPerson" ng-click="setPerson(person)"/></td>
+							<td>{{person.name + ' ' + person.lastname}}</td>
+							<td>{{person.email}}</td>
+							<td>{{person.passport}}</td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
 
-					<div id="dialog-form" title="Select Person"  >
-						<h2>Select Person</h2>
-						<table class="table table-bordered" id="select-person-table">
-							<thead>
-							<tr>
-								<th></th>
-								<th>Name</th>
-								<th>Email</th>
-								<th>Passport Number/ID</th>
-							</tr>
-							</thead>
-							<tbody class="member">
-							<tr ng-repeat="person in selectPersonTable">
-								<td><input type="radio" value="{{person.id}}" name="personGroup" ng-model="selectedPerson" ng-click="setPerson(person)"/></td>
-								<td>{{person.name + ' ' + person.lastname}}</td>
-								<td>{{person.email}}</td>
-								<td>{{person.passport}}</td>
-							</tr>
-							</tbody>
-						</table>
-
-						{{selectPersonTable}}
-					</div>
-
-
-
-					<div class="row">
-						<div class="col">
-
-							<button id="select-person" class="btn btn-success">Select Person</button>
-
-							@helper.form(action = routes.ContractController.addContract()) {
-
-								Person <input type="text" readonly class="form-control" ng-model="selectedPerson.name" size="20" />
-								<input type="hidden" id="personId" name="personId" @contractForm.data.get("personId") ng-model="selectedPerson.id"/>
-								Begin Date
-								<input type="text" id="beginDate" name="beginDate" @contractForm.data.get("beginDate") class="datepicker form-control" size="7" />
-								End Date
-								<input type="text" id="endDate" name="endDate" @contractForm.data.get("endDate") class="datepicker form-control" size="7" />
-
-								<div class="buttons">
-									<input type="submit" class="btn btn-success" value="Add Contract"/>
+				<div class="row">
+					<div class="col">
+						<form name="contractForm" data-toggle="validator" role="form">
+							<div class="row">
+								<div class="col">
+									<button id="select-person" class="btn btn-success">Select Person</button>
 								</div>
-							}
-						</div>
+							</div>
+							Person
+							<input type="text" readonly class="form-control" ng-model="selectedPerson.name" size="20" required/>
+							<input type="hidden" id="personId" name="personId" ng-model="selectedPerson.id" required/>
+							Begin Date
+							<input type="text" id="beginDate" name="beginDate" ng-model="beginDate" class="datepicker form-control" size="7" required/>
+							End Date
+							<input type="text" id="endDate" name="endDate" ng-model="endDate" class="datepicker form-control" size="7" required/>
+							Number of Advances
+							<select ng-model="numberAdvances" class="form-control" required>
+								<option>1</option>
+								<option>2</option>
+								<option>3</option>
+								<option>4</option>
+								<option>5</option>
+							</select>
+							Advance Amount
+							<input type="text" id="rentAmount" name="rentAmount" type="number" ng-model="rentAmount" class="form-control" size="7" required/>
+							Number of Deposits
+							<select ng-model="numberDeposits" class="form-control" required>
+								<option>1</option>
+								<option>2</option>
+								<option>3</option>
+								<option>4</option>
+								<option>5</option>
+							</select>
+							Deposit Amount
+							<input type="text" id="depositAmount" name="depositAmount" type="number" ng-model="depositAmount" class="form-control" size="7" required/>
+							Notes
+							<input type="text" id="notes" name="notes" ng-model="notes" class="form-control" size="7" required/>
 
+							<div class="input-group">
+								<span class="input-group-btn">
+									<div class="buttons col-md-8 h3">
+										<button id="createContract" ng-click="contractForm.$valid && insertContract();" class="btn btn-success">Add Contract</button>
+									</div>
+								</span>
+								<div ng-show="success" class="alert alert-success col-md-3 h5" role="alert">
+									<button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="closeSuccess();">
+										<span aria-hidden="true">&times;</span>
+									</button>
+									<p>Successful operation.</p>
+								</div>
+								<div ng-show="fail" class="alert alert alert-danger col-md-3 h5" role="alert">
+									<button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="closeFail();">
+										<span aria-hidden="true">&times;</span>
+									</button>
+									<p>Unexpected error occurred.</p>
+								</div>
+							</div>
+						</form>
 					</div>
+
+					<table class="table table-bordered the-table">
+						<thead>
+						<tr>
+							<th></th>
+							<th>Person</th>
+							<th>Passport</th>
+							<th>Begin Date</th>
+							<th>End Date</th>
+						</tr>
+						</thead>
+						<tbody class="member">
+						<tr ng-repeat="contract in contractList">
+							<td><button  ng-click="removeContract(contract)" class="btn btn-success btn-sm">Remove</button></td>
+							<td>{{contract.personName}}</td>
+							<td>{{contract.passport}}</td>
+							<td>{{contract.beginDate}}</td>
+							<td>{{contract.endDate}}</td>
+						</tr>
+						</tbody>
+					</table>
+					{{contractList}}
 				</div>
 			</div>
 		</div>
 
-		<div class="col" ng-controller="ContractList">
-			<h2>Contracts</h2>
-			<table class="table table-bordered">
-				<thead>
-				<tr>
-					<th>Person ID</th>
-					<th>Begin Date</th>
-					<th>End Date</th>
-				</tr>
-				</thead>
-				<tbody class="member">
-				<tr ng-repeat="contract in contractList">
-					<td>{{contract.personId}}</td>
-					<td>{{contract.beginDate}}</td>
-					<td>{{contract.endDate}}</td>
-				</tr>
-				</tbody>
-			</table>
 
-			{{contractList}}
-		</div>
 	</div>
 
 
