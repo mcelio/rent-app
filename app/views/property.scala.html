@@ -1,7 +1,85 @@
-@(implicit messages: Messages)
+@(menu: String)(implicit messages: Messages)
 
 @import helper._
 
-@main("Rent Manager", "person") {
 
-}
+@main("Rent manager", menu) {
+
+<script type='text/javascript'src='@routes.Assets.at("javascripts/property.js")'></script>
+
+<div class="container">
+    <h3>Property Data</h3>
+    <div class="row" ng-app="propertyApp" ng-controller="PropertyList">
+        <div class="col">
+            <form name="propertyForm" data-toggle="validator" role="form">
+                ID
+                <input type="text" ng-model="code" class="form-control" required/>
+                Address
+                Line 1
+                <input type="text" ng-model="line1" class="form-control"/>
+                Line 2
+                <input type="text" ng-model="line2" class="form-control"/>
+                Line 3
+                <input type="text" ng-model="line3" class="form-control"/>
+                Zip Code
+                <input type="text" ng-model="zipcode" class="form-control"/>
+                Rooms Available
+                <input type="text" ng-model="rooms" type="number" class="form-control" required/>
+
+                <div class="input-group">
+						<span class="input-group-btn">
+							<div class="buttons col-md-8 h3">
+								<button id="createProperty" ng-click="propertyForm.$valid && insertProperty();" class="btn btn-success">Add Property</button>
+							</div>
+						</span>
+                    <div ng-show="success" class="alert alert-success col-md-3 h5" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="closeSuccess();">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <p>Successful operation.</p>
+                    </div>
+                    <div ng-show="fail" class="alert alert alert-danger col-md-3 h5" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="closeFail();">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <p>Unexpected error occurred.</p>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+
+        <div class="col">
+            <div class="table-responsive">
+                <table class="table table-bordered table table-fixed">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>ID</th>
+                        <th>Line 1</th>
+                        <th>Line 2</th>
+                        <th>Line 3</th>
+                        <th>Zip code</th>
+                        <th>Rooms Available</th>
+                    </tr>
+                    </thead>
+                    <tbody class="member">
+                    <tr ng-repeat="property in propertyList">
+                        <td><button  ng-click="removeProperty(property)" class="btn btn-success btn-sm">Remove</button></td>
+                        <td>{{property.code}}</td>
+                        <td>{{property.line1}}</td>
+                        <td>{{property.line2}}</td>
+                        <td>{{property.line3}}</td>
+                        <td>{{property.zipcode}}</td>
+                        <td>{{property.rooms}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+    }
