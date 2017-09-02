@@ -1,12 +1,12 @@
 package dal
 
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
+
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-
 import models.Person
 
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
  * A repository for people.
@@ -46,6 +46,9 @@ class PersonRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impl
     /** The passwport column */
     def passport = column[String]("passport")
 
+    /** The removed column */
+    def removed = column[Boolean]("removed", O.Default(false))
+
     /**
      * This is the tables default "projection".
      *
@@ -54,7 +57,7 @@ class PersonRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impl
      * In this case, we are simply passing the id, name and page parameters to the Person case classes
      * apply and unapply methods.
      */
-    def * = (id, name, lastname, age, email, passport) <> ((Person.apply _).tupled, Person.unapply)
+    def * = (id, name, lastname, age, email, passport, removed) <> ((Person.apply _).tupled, Person.unapply)
   }
 
   /**
@@ -68,22 +71,56 @@ class PersonRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impl
    * This is an asynchronous operation, it will return a future of the created person, which can be used to obtain the
    * id for that person.
    */
-  def create(name: String, lastname: String, age: Int, email: String, passport: String): Future[Person] = db.run {
+  def create(name: String, lastname: String, age: Int, email: String, passport: String, removed: Boolean): Future[Person] = db.run {
     // We create a projection of just the name and age columns, since we're not inserting a value for the id column
-    (people.map(p => (p.name, p.lastname, p.age, p.email, p.passport))
+    (people.map(p => (p.name, p.lastname, p.age, p.email, p.passport, p.removed))
       // Now define it to return the id, because we want to know what id was generated for the person
       returning people.map(_.id)
       // And we define a transformation for the returned value, which combines our original parameters with the
       // returned id
-      into ((personData, id) => Person(id, personData._1, personData._2, personData._3, personData._4, personData._5))
+      into ((personData, id) => Person(id, personData._1, personData._2, personData._3, personData._4, personData._5, personData._6))
     // And finally, insert the person into the database
-    ) += (name, lastname, age, email, passport)
+    ) += (name, lastname, age, email, passport, removed)
+  }
+
+
+   def findById2(id: Long): Future[Seq[Person]] = {
+     val filter: Query[PeopleTable, Person, Seq] = people.filter(_.id === id)
+     db.run(filter.result)
+   }
+
+  def sfindById(id: Long): Future[Option[Person]] = db.run(
+    people.filter(_.id === id).result.map(_.headOption)
+  )
+
+  def findById(id: Long): Seq[Person] = {
+    import scala.concurrent.duration.Duration
+    val filter: Query[PeopleTable, Person, Seq] = people.filter(_.id === id)
+    Await.result(db.run(filter.result), Duration.Inf)
+  }
+
+
+  /**
+    * Update person
+    * @param id
+    * @return
+    */
+  def delete(id: Long): Future[Int] = {
+    val q = for {p <- people if p.id === id} yield p.removed
+    db.run(q.update(true))
+
+//    people.filter(_.id === id).map { p =>
+//      p.removed
+//    }.update(true)
   }
 
   /**
    * List all the people in the database.
    */
   def list(): Future[Seq[Person]] = db.run {
-    people.result
+    people.filter(!_.removed).result
+    //people.result
   }
+
+
 }
