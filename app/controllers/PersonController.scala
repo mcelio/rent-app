@@ -12,7 +12,6 @@ import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Success
 
 class PersonController @Inject()(repo: PersonRepository,
                                   cc: ControllerComponents
@@ -20,23 +19,10 @@ class PersonController @Inject()(repo: PersonRepository,
   extends AbstractController(cc) with I18nSupport {
 
   /**
-   * The mapping for the person form.
-   */
-  val personForm: Form[CreatePersonForm] = Form {
-    mapping(
-      "name" -> nonEmptyText,
-      "lastname" -> nonEmptyText,
-      "age" -> number.verifying(min(0), max(140)),
-      "email" -> email,
-      "passport" -> nonEmptyText
-    )(CreatePersonForm.apply)(CreatePersonForm.unapply)
-  }
-
-  /**
    * The person action.
    */
   def person = Action { implicit request =>
-    Ok(views.html.person(personForm, "person"))
+    Ok(views.html.person("person"))
   }
 
   /**
@@ -49,6 +35,17 @@ class PersonController @Inject()(repo: PersonRepository,
   }
 
 
+  def deletePerson(id: Long) = Action.async { implicit request =>
+    repo.delete(id).map{
+      person =>
+        Ok(Json.toJson(person))
+    }
+  }
+
+  def fetchPerson(id: Long) = Action.async { implicit request =>
+      val person = repo.findById(id).headOption
+      Future{Ok(Json.toJson(person))}
+  }
 
 
   def createPerson() = Action.async { implicit request =>
@@ -59,22 +56,13 @@ class PersonController @Inject()(repo: PersonRepository,
     val age = (jsonBody \ "age").as[String]
     val email = (jsonBody \ "email").as[String]
     val passport = (jsonBody \ "passport").as[String]
-    repo.create(name, lastname, age.toInt, email, passport) map {personObj =>
+    repo.create(name, lastname, age.toInt, email, passport, false) map {personObj =>
       Future {
         Ok(Json.toJson(personObj))
       }
     }
     Future {
-      Ok(views.html.person(personForm, "person"))
+      Ok(views.html.person("person"))
     }
   }
 }
-
-/**
- * The create person form.
- *
- * Generally for forms, you should define separate objects to your models, since forms very often need to present data
- * in a different way to your models.  In this case, it doesn't make sense to have an id parameter in the form, since
- * that is generated once it's created.
- */
-case class CreatePersonForm(name: String, lastname: String, age: Int, email: String, passport: String)
