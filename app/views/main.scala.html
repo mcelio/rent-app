@@ -10,11 +10,11 @@
         <script type='text/javascript'src='@routes.Assets.at("javascripts/jquery-2.2.0.min.js")'></script>
         <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")"/>
         <link rel="stylesheet" href='@routes.Assets.at("bootstrap-3.3.7/css/bootstrap.min.css")'/>
+        <script type='text/javascript'src='@routes.Assets.at("bootstrap-3.3.7/js/bootstrap.min.js")'></script>
         <link rel="stylesheet" href='@routes.Assets.at("jquery-ui-1.12.1.custom/jquery-ui.css")'/>
         <script type='text/javascript'src='@routes.Assets.at("jquery-ui-1.12.1.custom/jquery-ui.min.js")'></script>
         <script type='text/javascript'src='@routes.Assets.at("angular-1.6.5/angular.min.js")'></script>
         <script type='text/javascript'src='@routes.Assets.at("angular-1.6.5/angular-resource.min.js")'></script>
-        <script type='text/javascript'src='@routes.Assets.at("javascripts/rent-app.js")'></script>
     </head>
 
     @activeLink(value:String) = @{
@@ -40,6 +40,7 @@
                 <ul class="nav navbar-nav navbar-left">
                     <li class="@activeLink("person")"><a href="/person">Person</a></li>
                     <li class="@activeLink("contract")"><a href="/contract">Contract</a></li>
+                    <li class="@activeLink("property")"><a href="/property">Property</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li ><a href="#">Login</a></li>
