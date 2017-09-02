@@ -3,77 +3,81 @@ package controllers
 import javax.inject._
 
 import dal._
-import play.api.data.Form
-import play.api.data.Forms.{mapping, longNumber, nonEmptyText}
-import play.api.data.validation.Constraints._
+import models.{Contract, Person}
 import play.api.i18n._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class ContractController @Inject()(repo: ContractRepository,
-                                 cc: ControllerComponents
+                                   personRepo: PersonRepository,
+                                   cc: ControllerComponents
                                 )(implicit ec: ExecutionContext)
   extends AbstractController(cc) with I18nSupport {
 
-  /**
-    * The mapping for the contract form.
-    */
-  val contractForm: Form[CreateContractForm] = Form {
-    mapping(
-      "personId" -> longNumber,
-      "beginDate" -> nonEmptyText,
-      "endDate" -> nonEmptyText
-    )(CreateContractForm.apply)(CreateContractForm.unapply)
+
+  implicit val writer = new Writes[(Contract, Seq[Person])] {
+    def writes(t: (Contract, Seq[Person])): JsValue = {
+      val personName = t._2(0).name
+      val passport = t._2(0).passport
+
+
+      Json.obj("id: " -> t._1.id, "beginDate" -> t._1.beginDate, "endDate" -> t._1.endDate, "notes" -> t._1.notes,
+        "rentAmount" -> t._1.rentAmount, "depositAmout" -> t._1.depositAmount,
+        "numberAdvances" -> t._1.numberAdvances, "numberDeposits" -> t._1.numberDeposits, "personName" -> personName,
+        "passport" -> passport)
+    }
   }
 
   /**
     * The contract action.
     */
   def contract = Action { implicit request =>
-    Ok(views.html.contract(contractForm, "contract") )
+    Ok(views.html.contract("contract"))
   }
 
-  /**
-    * The add contract action.
-    *
-    * This is asynchronous, since we're invoking the asynchronous methods on ContractRepository.
-    */
-  def addContract = Action.async { implicit request =>
-    // Bind the form first, then fold the result, passing a function to handle errors, and a function to handle succes.
-    contractForm.bindFromRequest.fold(
-      // The error function. We return the index page with the error form, which will render the errors.
-      // We also wrap the result in a successful future, since this action is synchronous, but we're required to return
-      // a future because the contract creation function returns a future.
-      errorForm => {
-        Future.successful(Ok(views.html.contract(errorForm, "contract")))
-      },
-      // There were no errors in the from, so create the contract.
-      contract => {
-        repo.create(contract.personId, contract.beginDate, contract.endDate).map { _ =>
-          // If successful, we simply redirect to the index page.
-          Redirect(routes.ContractController.contract)
-        }
+  def createContract() = Action.async { implicit request =>
+    implicit val contractReader = Json.reads[Contract]
+    val jsonBody: JsValue = request.body.asJson.get
+    val personId = (jsonBody \ "personId").as[Long]
+    val beginDate = (jsonBody \ "beginDate").as[String]
+    val endDate = (jsonBody \ "endDate").as[String]
+    val numberAdvances = (jsonBody \ "numberAdvances").as[String]
+    val rentAmount = (jsonBody \ "rentAmount").as[String]
+    val numberDeposits = (jsonBody \ "numberDeposits").as[String]
+    val depositAmount = (jsonBody \ "depositAmount").as[String]
+    val notes = (jsonBody \ "notes").as[String]
+    repo.create(personId, beginDate, endDate, numberAdvances.toInt, numberDeposits.toInt, rentAmount.toDouble,
+      depositAmount.toDouble, notes, false) map {personObj =>
+      Future {
+        Ok(Json.toJson(personObj))
       }
-    )
+    }
+    Future {
+      Ok(views.html.contract("contract"))
+    }
+  }
+
+
+  def deleteContract(id: Long) = Action.async { implicit request =>
+    repo.delete(id).map{
+      contract =>
+        Ok(Json.toJson(contract))
+    }
   }
 
   /**
     * A REST endpoint that gets all the people as JSON.
     */
   def getContracts = Action.async { implicit request =>
-    repo.list().map { contracts =>
-      Ok(Json.toJson(contracts))
+    repo.list().map(contracts =>
+      contracts.map(contract => {
+        (contract, personRepo.findById(contract.personId))
+      })
+    ).map { results =>
+      Ok(Json.toJson(results))
     }
   }
 }
-
-/**
-  * The create contract form.
-  *
-  * Generally for forms, you should define separate objects to your models, since forms very often need to present data
-  * in a different way to your models.  In this case, it doesn't make sense to have an id parameter in the form, since
-  * that is generated once it's created.
-  */
-case class CreateContractForm(personId: Long, beginDate: String, endDate: String)
