@@ -4,9 +4,6 @@ import javax.inject._
 
 import dal._
 import models.Person
-import play.api.data.Form
-import play.api.data.Forms._
-import play.api.data.validation.Constraints._
 import play.api.i18n._
 import play.api.libs.json._
 import play.api.mvc._
@@ -22,7 +19,12 @@ class PersonController @Inject()(repo: PersonRepository,
    * The person action.
    */
   def person = Action { implicit request =>
-    Ok(views.html.person("person"))
+    val auth = request.session.get("authorization").getOrElse("false").toBoolean
+    if (auth) {
+      Ok(views.html.person("person"))
+    } else{
+      Ok(views.html.login())
+    }
   }
 
   /**
