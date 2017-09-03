@@ -86,7 +86,7 @@ app.controller('ContractList', function($http, $scope) {
 
      $scope.insertContract = function(){
         $scope.clearMessages();
-        var jsonData = JSON.stringify({'personId':$scope.selectedPerson.id, 'personId':$scope.selectedPerson.id,
+        var jsonData = JSON.stringify({'propertyId':$scope.selectedPerson.id, 'personId':$scope.selectedPerson.id,
         'beginDate':$scope.beginDate,
             'endDate':$scope.endDate,'numberAdvances':$scope.numberAdvances,'rentAmount':$scope.rentAmount,
             'numberDeposits':$scope.numberDeposits,'depositAmount':$scope.depositAmount,'notes':$scope.notes});
