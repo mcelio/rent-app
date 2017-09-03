@@ -22,7 +22,17 @@ class PropertyController @Inject()(repo: PropertyRepository,
     * The person action.
     */
   def property = Action { implicit request =>
-    Ok(views.html.property("property"))
+    val auth = request.session.get("authorization").getOrElse("false").toBoolean
+    if (auth) {
+      Ok(views.html.property("property"))
+    } else{
+      Ok(views.html.login())
+    }
+  }
+
+  def fetchProperty(id: Long) = Action.async { implicit request =>
+    val property = repo.findById(id).headOption
+    Future{Ok(Json.toJson(property))}
   }
 
   /**
