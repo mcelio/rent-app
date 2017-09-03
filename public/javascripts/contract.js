@@ -22,13 +22,23 @@ app.controller('ContractList', function($http, $scope) {
           $scope.selectPersonTable = response.data;
       });
 
+      $http.get("/properties").then(function(response) {
+                $scope.selectPropertyTable = response.data;
+            });
+
       $scope.setPerson = function(person){
          $scope.selectedPerson = person;
+      }
+
+      $scope.setProperty = function(property){
+         $scope.selectedProperty = property;
       }
 
     $scope.clearForm = function(){
         $scope.selectedPerson.name = '';
         $scope.selectedPerson.id = '';
+        $scope.selectedProperty.id = '';
+        $scope.selectedProperty.code = '';
         $scope.beginDate = '';
         $scope.endDate = '';
         $scope.numberAdvances = '';
@@ -76,7 +86,8 @@ app.controller('ContractList', function($http, $scope) {
 
      $scope.insertContract = function(){
         $scope.clearMessages();
-        var jsonData = JSON.stringify({'personId':$scope.selectedPerson.id, 'beginDate':$scope.beginDate,
+        var jsonData = JSON.stringify({'personId':$scope.selectedPerson.id, 'personId':$scope.selectedPerson.id,
+        'beginDate':$scope.beginDate,
             'endDate':$scope.endDate,'numberAdvances':$scope.numberAdvances,'rentAmount':$scope.rentAmount,
             'numberDeposits':$scope.numberDeposits,'depositAmount':$scope.depositAmount,'notes':$scope.notes});
         $http.post('/createContract', jsonData).then(function success(response) {
