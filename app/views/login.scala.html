@@ -1,10 +1,53 @@
+@()(implicit messages: Messages)
+
+@import helper._
+
 <!DOCTYPE html>
-<html lang="en">
+
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Rent Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")"/>
+    <script type='text/javascript'src='@routes.Assets.at("javascripts/jquery-2.2.0.min.js")'></script>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")"/>
+    <link rel="stylesheet" href='@routes.Assets.at("bootstrap-3.3.7/css/bootstrap.min.css")'/>
+    <script type='text/javascript'src='@routes.Assets.at("bootstrap-3.3.7/js/bootstrap.min.js")'></script>
+    <link rel="stylesheet" href='@routes.Assets.at("jquery-ui-1.12.1.custom/jquery-ui.css")'/>
+    <script type='text/javascript'src='@routes.Assets.at("jquery-ui-1.12.1.custom/jquery-ui.min.js")'></script>
+    <script type='text/javascript'src='@routes.Assets.at("angular-1.6.5/angular.min.js")'></script>
+    <script type='text/javascript'src='@routes.Assets.at("angular-1.6.5/angular-resource.min.js")'></script>
+    <script type='text/javascript'src='@routes.Assets.at("javascripts/login.js")'></script>
 </head>
+
 <body>
-$END$
+<div class="container">
+    <h3>Login Page</h3>
+    <div class="row" ng-app="loginApp" ng-controller="LoginHelper">
+        <div class="col">
+            <form name="loginForm" data-toggle="validator" role="form">
+                ID
+                <input type="text" ng-model="username" class="form-control" required/>
+                Password
+                <input type="password" ng-model="password" class="form-control" required/>
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <div class="buttons col-md-8 h3">
+                            <button id="login" ng-click="loginForm.$valid && login();" class="btn btn-success">Login</button>
+                        </div>
+                    </span>
+                    <div ng-show="fail" class="alert alert alert-danger col-md-3 h5" role="alert">
+                         <button type="button" class="close" data-dismiss="alert" aria-label="Close" ng-click="closeFail();">
+                            <span aria-hidden="true">&times;</span>
+                         </button>
+                         <p>Please verify your credentials.</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 </body>
 </html>
