@@ -4,21 +4,22 @@
 
 @main("Rent manager", menu) {
 
-<script type='text/javascript'src='@routes.Assets.at("javascripts/contract.js")'></script>
+	<script type='text/javascript'src='@routes.Assets.at("javascripts/contract.js")'></script>
 	<script>
 		$(document).ready(function(){
-			var dialog = $( "#dialog-form" ).dialog({
+
+			var propertyDialog = $( "#property-dialog-form" ).dialog({
 			  autoOpen: false,
 			  height: 400,
 			  width: 550,
 			  modal: true,
 			  buttons: {
 				"Select Person": function() {
-					$("#personId").val(($('input[name=personGroup]:checked'	).val()));
-					dialog.dialog( "close" );
+					$("#propertyId").val(($('input[name=propertyGroup]:checked'	).val()));
+					propertyDialog.dialog( "close" );
 				},
 				Cancel: function() {
-				  dialog.dialog( "close" );
+				  propertyDialog.dialog( "close" );
 				}
 			  },
 			  close: function() {
@@ -26,13 +27,10 @@
 			  }
 			});
 
-			$( "#select-person" ).button().on( "click", function() {
-			  	dialog.dialog( "open" );
+			$( "#select-property" ).button().on( "click", function() {
+			  	propertyDialog.dialog( "open" );
+			  	event.preventDefault();
 			});
-
-			$('#beginDate').datepicker();
-
-			$('#endDate').datepicker();
 		});
 	</script>
 
@@ -40,39 +38,105 @@
 		<h3>Contract Data</h3>
 		<div class="row">
 			<div class='col'>
-				<div id="dialog-form" title="Select Person">
-					<h2>Select Person</h2>
-					<table class="table table-bordered table table-fixed">
-						<thead>
-						<tr>
-							<th></th>
-							<th>Name</th>
-							<th>Email</th>
-							<th>Passport Number/ID</th>
-						</tr>
-						</thead>
-						<tbody class="member">
-						<tr ng-repeat="person in selectPersonTable">
-							<td><input type="radio" value="{{person.id}}" name="personGroup" ng-model="selectedPerson" ng-click="setPerson(person)"/></td>
-							<td>{{person.name + ' ' + person.lastname}}</td>
-							<td>{{person.email}}</td>
-							<td>{{person.passport}}</td>
-						</tr>
-						</tbody>
-					</table>
+				<div class="modal fade" id="personModal" role="dialog">
+					<div class="modal-dialog">
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title">Person Table</h4>
+							</div>
+							<div class="modal-body">
+								<div class="table-responsive">
+									<table class="table table-bordered table table-fixed">
+										<thead>
+										<tr>
+											<th></th>
+											<th>Name</th>
+											<th>Email</th>
+											<th>Passport Number/ID</th>
+										</tr>
+										</thead>
+										<tbody class="member">
+										<tr ng-repeat="person in selectPersonTable">
+											<td><input type="radio" value="{{person.id}}" name="personGroup" ng-model="selectedPerson" ng-click="setPerson(person)"/></td>
+											<td>{{person.name + ' ' + person.lastname}}</td>
+											<td>{{person.email}}</td>
+											<td>{{person.passport}}</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Select Person</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+
+
+
+				<div class="modal fade" id="propertyModal" role="dialog">
+					<div class="modal-dialog">
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title">Property Table</h4>
+							</div>
+							<div class="modal-body">
+								<div class="table-responsive">
+									<table class="table table-bordered table table-fixed">
+										<thead>
+										<tr>
+											<th></th>
+											<th>Code</th>
+											<th>Line1</th>
+											<th>Line2</th>
+											<th>Line3</th>
+											<th>Zip Code</th>
+										</tr>
+										</thead>
+										<tbody class="member">
+										<tr ng-repeat="property in selectPropertyTable">
+											<td><input type="radio" value="{{property.id}}" name="propertyGroup" ng-model="selectedProperty" ng-click="setProperty(property)"/></td>
+											<td>{{property.code}}</td>
+											<td>{{property.line1}}</td>
+											<td>{{property.line2}}</td>
+											<td>{{property.line3}}</td>
+											<td>{{property.zipcode}}</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Select Property</button>
+							</div>
+						</div>
+
+					</div>
 				</div>
 
 				<div class="row">
 					<div class="col">
 						<form name="contractForm" data-toggle="validator" role="form">
-							<div class="row">
-								<div class="col">
-									<button id="select-person" class="btn btn-success">Select Person</button>
-								</div>
+
+							<div class="buttons">
+								<button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#personModal">Select Person</button>
 							</div>
-							Person
 							<input type="text" readonly class="form-control" ng-model="selectedPerson.name" size="20" required/>
 							<input type="hidden" id="personId" name="personId" ng-model="selectedPerson.id" required/>
+
+							<div class="buttons">
+								<button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#propertyModal">Select Property</button>
+							</div>
+							<input type="text" readonly class="form-control" ng-model="selectedProperty.code" size="20" required/>
+							<input type="hidden" id="propertyId" name="propertyId" ng-model="selectedProperty.id" required/>
+
 							Begin Date
 							<input type="text" id="beginDate" name="beginDate" ng-model="beginDate" class="datepicker form-control" size="7" required/>
 							End Date
@@ -122,12 +186,13 @@
 						</form>
 					</div>
 
-					<table class="table table-bordered the-table">
+					<table class="table table-bordered table table-fixed">
 						<thead>
 						<tr>
 							<th></th>
 							<th>Person</th>
 							<th>Passport</th>
+							<th>Property</th>
 							<th>Begin Date</th>
 							<th>End Date</th>
 						</tr>
@@ -137,19 +202,14 @@
 							<td><button  ng-click="removeContract(contract)" class="btn btn-success btn-sm">Remove</button></td>
 							<td>{{contract.personName}}</td>
 							<td>{{contract.passport}}</td>
+							<td>{{contract.propertyCode}}</td>
 							<td>{{contract.beginDate}}</td>
 							<td>{{contract.endDate}}</td>
 						</tr>
 						</tbody>
 					</table>
-					{{contractList}}
 				</div>
 			</div>
 		</div>
-
-
 	</div>
-
-
-
 }
