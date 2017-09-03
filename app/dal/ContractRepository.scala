@@ -34,6 +34,9 @@ class ContractRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(im
     /** The person column */
     def personId = column[Long]("personId")
 
+    /** The property column */
+    def propertyId = column[Long]("propertyId")
+
     /** The beginDate column */
     def beginDate = column[String]("beginDate")
 
@@ -66,7 +69,7 @@ class ContractRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(im
       * In this case, we are simply passing the id, name and page parameters to the Person case classes
       * apply and unapply methods.
       */
-    def * = (id, personId, beginDate, endDate, numberAdvances, numberDeposits, rentAmount, depositAmount, notes,
+    def * = (id, propertyId, personId, beginDate, endDate, numberAdvances, numberDeposits, rentAmount, depositAmount, notes,
       removed) <> ((Contract.apply _).tupled, Contract.unapply)
   }
 
@@ -81,19 +84,19 @@ class ContractRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(im
     * This is an asynchronous operation, it will return a future of the created person, which can be used to obtain the
     * id for that person.
     */
-  def create(personId: Long, beginDate: String, endDate: String, numberAdvances: Int, numberDeposits: Int,
+  def create(propertyId: Long, personId: Long, beginDate: String, endDate: String, numberAdvances: Int, numberDeposits: Int,
              rentAmount: Double, depositAmount: Double, notes: String, removed: Boolean): Future[Contract] = db.run {
     // We create a projection of just the name and age columns, since we're not inserting a value for the id column
-    (contracts.map(c => (c.personId, c.beginDate, c.endDate, c.numberAdvances, c.numberDeposits, c.rentAmount,
+    (contracts.map(c => (c.propertyId, c.personId, c.beginDate, c.endDate, c.numberAdvances, c.numberDeposits, c.rentAmount,
       c.depositAmount, c.notes, c.removed))
       // Now define it to return the id, because we want to know what id was generated for the person
       returning contracts.map(_.id)
       // And we define a transformation for the returned value, which combines our original parameters with the
       // returned id
       into ((contractData, id) => Contract(id, contractData._1, contractData._2, contractData._3, contractData._4,
-      contractData._5, contractData._6, contractData._7, contractData._8, contractData._9))
+      contractData._5, contractData._6, contractData._7, contractData._8, contractData._9, contractData._10))
       // And finally, insert the person into the database
-      ) += (personId, beginDate, endDate, numberAdvances, numberDeposits, rentAmount, depositAmount, notes, removed)
+      ) += (propertyId, personId, beginDate, endDate, numberAdvances, numberDeposits, rentAmount, depositAmount, notes, removed)
   }
 
   /**
