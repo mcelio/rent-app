@@ -1,12 +1,12 @@
 package dal
 
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
+
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-
 import models.Property
 
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
   * A repository for properties.
@@ -98,6 +98,12 @@ class PropertyRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(im
     //    people.filter(_.id === id).map { p =>
     //      p.removed
     //    }.update(true)
+  }
+
+  def findById(id: Long): Seq[Property] = {
+    import scala.concurrent.duration.Duration
+    val filter: Query[PropertyTable, Property, Seq] = properties.filter(_.id === id)
+    Await.result(db.run(filter.result), Duration.Inf)
   }
 
   /**
